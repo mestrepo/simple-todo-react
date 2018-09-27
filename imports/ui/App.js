@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import { withTracker } from 'meteor/react-meteor-data';
 
 import { Tasks } from '../api/tasks.js';
@@ -20,6 +21,14 @@ class App extends Component {
             <div className="container">
                 <header>
                     <h1>Todo List</h1>
+
+                    <form className="new-task" onSubmit={this.handleSubmit.bind(this)} >
+                        <input
+                            type="text"
+                            ref="textInput"
+                            placeholder="Type to add new tasks"
+                        />
+                    </form>
                 </header>
 
                 <ul>
