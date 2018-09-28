@@ -9,6 +9,14 @@ import Task from './Task.js';
 
 // App component - represents the whole app
 class App extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            hideCompleted: false,
+        };
+    }
+
     handleSubmit(event) {
         event.preventDefault();
 
