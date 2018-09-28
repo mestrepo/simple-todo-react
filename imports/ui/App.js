@@ -32,6 +32,12 @@ class App extends Component {
         ReactDOM.findDOMNode(this.refs.textInput).value = '';
     }
 
+    toggleHideCompleted() {
+        this.setState({
+            hideCompleted: !this.state.hideCompleted,
+        });
+    }
+
     renderTasks() {
         return this.props.tasks.map((task) => (
 
