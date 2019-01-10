@@ -1,4 +1,5 @@
 import assert from "assert";
+import "../imports/api/tasks.tests.js";
 
 describe("simple-todo-react", function () {
   it("package.json has correct name", async function () {
