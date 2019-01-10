@@ -10,7 +10,6 @@ import { Tasks } from './tasks.js';
 if (Meteor.isServer) {
     describe('Tasks', () => {
         describe('methods', () => {
-            // const userId = Random.id();
             const username = 'me';
             let taskId, userId;
 
@@ -114,7 +113,6 @@ if (Meteor.isServer) {
                 // create fake user object without userID
                 // to emulate User not logged in
                 let fakeUserObject = {
-                    // 'userId': userId,
                     'username': username
                 };
 
@@ -134,30 +132,92 @@ if (Meteor.isServer) {
              */
             it("can set task checked", () => {
                 // 1. housekeeping/set up environment
-                const setChecked = true;
-                // const taskOneText = 'task one';
+                const setToPrivate = true;
 
                 // 2. get method unit
                 const setTaskChecked = Meteor.server.method_handlers['tasks.setChecked'];
-                // const insertTask = Meteor.server.method_handlers['tasks.insert'];
 
                 // 3. Setup fake global object
                 let fakeUserObject = {
                     'userId' : userId,
                     'username': username,
-                    'private' : true,
-
+                    'private' : true
                 }
 
+                console.log("TODUN: " + Tasks.findOne(taskId).private)
                 assert.isNotTrue(Tasks.findOne(taskId).private);
 
-
                 // 4. Run method with fake object and required arguments
-                setTaskChecked.apply(fakeUserObject, [taskId, setChecked]);
+                setTaskChecked.apply(fakeUserObject, [taskId, setToPrivate]);
 
                 // 5. Perform checks
-                // assert.isTrue(Tasks.findOne(taskId).private);
                 assert.equal(Tasks.find({checked: true}).count(), 1);
+            });
+
+            it("cannot set someone else's private task checked", () => {
+                // 1. housekeeping/set up environment
+                // Set task to private
+                const setToPrivate = true;
+                Tasks.update(taskId, { $set: { private: setToPrivate } });
+
+                // 2. get method unit
+                // Generate a random ID, rep. a different user
+                const anotherUserId = Random.id();
+
+                // 3. Setup fake global object
+                const fakeUserObject = { "userId": anotherUserId };
+
+                // 4. Run method with fake object and required arguments
+                // Run test
+                const setChecked = Meteor.server.method_handlers['tasks.setChecked'];
+
+                // 5. Perform checks
+                // Verify that error is thrown
+                assert.throws(function() {
+                    setChecked.apply(fakeUserObject, [taskId, setToPrivate])
+                }, Meteor.Error, 'not-authorized');
+            });
+
+            /**
+             * Set private
+             */
+            it("can set task private", () => {
+                // 1. housekeeping/set up environment
+                const setToPrivate = true;
+
+                // 2. get method unit
+                // Get method
+                const setPrivate = Meteor.server.method_handlers['tasks.setPrivate'];
+
+                // 3. Setup fake global object
+                // Create fake user object
+                const fakeUserObject = { userId };
+
+                // 4. Run method with fake object and required arguments
+                // Run tests
+                setPrivate.apply(fakeUserObject, [taskId, setToPrivate]);
+
+                // 5. Perform checks
+                assert.equal(Tasks.find({private: setToPrivate}).count(), 1);
+            });
+
+            it("cannot set someone else's private task private", () => {
+                // 1. housekeeping/set up environment
+                const anotherUserId = Random.id();
+
+                // 2. get method unit
+                const setPrivate = Meteor.server.method_handlers['tasks.setPrivate'];
+
+                // 3. Setup fake global object
+                const fakeUserObject = { 'userId': anotherUserId };
+
+                // 4. Run method with fake object and required arguments
+                assert.throws(function() {
+                    setPrivate.apply(fakeUserObject, [taskId, true]);
+                }, Meteor.Error, 'not-authorized');
+
+                // 5. Perform checks
+                assert.equal(Tasks.find({private: true}).count(), 0);
             });
         });
     });
