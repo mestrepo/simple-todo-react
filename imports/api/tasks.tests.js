@@ -128,6 +128,37 @@ if (Meteor.isServer) {
                 // 5. Perform checks
                 assert.equal(Tasks.find().count(), 1);
             });
+
+            /**
+             * Set Checked
+             */
+            it("can set task checked", () => {
+                // 1. housekeeping/set up environment
+                const setChecked = true;
+                // const taskOneText = 'task one';
+
+                // 2. get method unit
+                const setTaskChecked = Meteor.server.method_handlers['tasks.setChecked'];
+                // const insertTask = Meteor.server.method_handlers['tasks.insert'];
+
+                // 3. Setup fake global object
+                let fakeUserObject = {
+                    'userId' : userId,
+                    'username': username,
+                    'private' : true,
+
+                }
+
+                assert.isNotTrue(Tasks.findOne(taskId).private);
+
+
+                // 4. Run method with fake object and required arguments
+                setTaskChecked.apply(fakeUserObject, [taskId, setChecked]);
+
+                // 5. Perform checks
+                // assert.isTrue(Tasks.findOne(taskId).private);
+                assert.equal(Tasks.find({checked: true}).count(), 1);
+            });
         });
     });
 }
