@@ -36,6 +36,29 @@ if (Meteor.isServer) {
                 // Verify that the method does what we expected
                 assert.equal(Tasks.find().count(), 0);
             });
+
+            it("cannot delete someone else's task", () => {
+                // Set existing task private
+                Tasks.update(taskId, {$set: { private: true}});
+
+                // Generate random ID to rep another user
+                const anotherUserId = Random.id();
+                
+                // Isolate delete method
+                const deleteTask = Meteor.server.method_handlers['tasks.remove'];
+                
+                // create fake userId object for method
+                const fakeUserObject = {'userId' : anotherUserId};
+
+                //Verify that exception is thrown
+                assert.throws(function() {
+                    // Run the method with `this` set to the fake UserObject
+                    deleteTask.apply(fakeUserObject, [taskId]);
+                }, Meteor.Error, 'not-authorized');
+
+                // Verify that task is not deleted
+                assert.equal(Tasks.find().count(), 1);
+            });
         });
     });
 }
