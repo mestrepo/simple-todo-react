@@ -96,6 +96,32 @@ if (Meteor.isServer) {
                 // 5. Perform checks
                 assert.equal(Tasks.find().count(), 2);
             });
+
+            it("cannot insert task if not logged in", () => {
+                // 1. housekeeping/set up environment
+                const taskOneText = 'task one';
+
+                // 2. get method unit
+                const insertTask = Meteor.server.method_handlers['tasks.insert'];
+
+                // 3. Setup fake global object
+                // create fake user object without userID
+                // to emulate User not logged in
+                let fakeUserObject = {
+                    // 'userId': userId,
+                    'username': username
+                };
+
+                // 4. Run method with fake object and required arguments
+                // Verify that exception is thrown when trying to insert
+                // when not logged in
+                assert.throws(function() {
+                    insertTask.apply(fakeUserObject, [taskOneText]);
+                }, Meteor.Error, 'not-authorized');
+
+                // 5. Perform checks
+                assert.equal(Tasks.find().count(), 1);
+            });
         });
     });
 }
