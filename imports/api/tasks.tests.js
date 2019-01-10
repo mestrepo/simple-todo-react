@@ -38,6 +38,9 @@ if (Meteor.isServer) {
                 });
             });
 
+            /**
+             * Delete tests
+             */
             it('can delete owned task', () => {
                 // Find the internal implementation of the task method so we can
                 // test it in isolation
@@ -76,6 +79,9 @@ if (Meteor.isServer) {
                 assert.equal(Tasks.find().count(), 1);
             });
 
+            /**
+             * Insert tests
+             */
             it("can insert task", () => {
                 // 1. housekeeping/set up environment
                 const taskOneText = 'task one';
