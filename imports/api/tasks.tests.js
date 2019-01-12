@@ -144,7 +144,6 @@ if (Meteor.isServer) {
                     'private' : true
                 }
 
-                console.log("TODUN: " + Tasks.findOne(taskId).private)
                 assert.isNotTrue(Tasks.findOne(taskId).private);
 
                 // 4. Run method with fake object and required arguments
